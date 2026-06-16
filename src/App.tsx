@@ -20,6 +20,14 @@ interface WeatherData {
   visibility: number;
 }
 
+interface CitySuggestion {
+  name: string;
+  lat: number;
+  lon: number;
+  country: string;
+  state?: string;
+}
+
 /* ─── Weather scene type ─────────────────────────────────── */
 type Scene =
   | "night"
@@ -506,6 +514,15 @@ function fmtClock(d: Date): string {
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
 }
 
+// Renders the live local time at the searched city, using its UTC offset
+// rather than the visitor's own device timezone.
+function fmtCityClock(nowMs: number, tzOffsetSeconds: number): string {
+  const shifted = new Date(nowMs + tzOffsetSeconds * 1000);
+  return shifted.toLocaleTimeString([], {
+    hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZone: "UTC",
+  });
+}
+
 function uvFromWeatherId(id: number): number {
   if (id >= 800) return 7;
   if (id >= 700) return 2;
@@ -600,6 +617,12 @@ const SunsetIcon = () => (
     <polyline points="7 15 5 17" /><polyline points="17 15 19 17" />
   </svg>
 );
+const ClockIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3.5 2" />
+  </svg>
+);
 
 /* ─── App ────────────────────────────────────────────────── */
 export default function App() {
@@ -608,7 +631,13 @@ export default function App() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [clock, setClock] = useState(new Date());
+  const [suggestions, setSuggestions] = useState<CitySuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggLoading, setSuggLoading] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+  const searchBlockRef = useRef<HTMLDivElement>(null);
+  const skipNextLookupRef = useRef(false);
   const API_KEY = "e707cf0cf6c6b09c949bb02e32bf1c42";
 
   useEffect(() => {
@@ -616,7 +645,44 @@ export default function App() {
     return () => clearInterval(id);
   }, []);
 
+  // Close the suggestions dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (searchBlockRef.current && !searchBlockRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  // Debounced city-suggestion lookup as the user types
+  useEffect(() => {
+    if (skipNextLookupRef.current) { skipNextLookupRef.current = false; return; }
+    const query = city.trim();
+    if (query.length < 2) { setSuggestions([]); setShowSuggestions(false); return; }
+
+    const id = setTimeout(async () => {
+      try {
+        setSuggLoading(true);
+        const res = await axios.get<CitySuggestion[]>(
+          `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
+        );
+        setSuggestions(res.data);
+        setShowSuggestions(res.data.length > 0);
+        setActiveIndex(-1);
+      } catch {
+        setSuggestions([]);
+      } finally {
+        setSuggLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(id);
+  }, [city]);
+
   const fetchWeather = useCallback(async () => {
+    setShowSuggestions(false);
     if (!city.trim()) { setError("Enter a city name to get started"); setWeather(null); return; }
     try {
       setLoading(true); setError("");
@@ -630,8 +696,56 @@ export default function App() {
     } finally { setLoading(false); }
   }, [city]);
 
+  const fetchWeatherByCoords = useCallback(async (lat: number, lon: number) => {
+    try {
+      setLoading(true); setError("");
+      const res = await axios.get<WeatherData>(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+      );
+      setWeather(res.data);
+    } catch {
+      setWeather(null);
+      setError("Couldn't load weather for that location — try again");
+    } finally { setLoading(false); }
+  }, []);
+
+  const handleSelectSuggestion = useCallback((s: CitySuggestion) => {
+    skipNextLookupRef.current = true;
+    setCity(s.name);
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setActiveIndex(-1);
+    fetchWeatherByCoords(s.lat, s.lon);
+    inputRef.current?.blur();
+  }, [fetchWeatherByCoords]);
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (showSuggestions && suggestions.length > 0) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((i) => (i + 1) % suggestions.length);
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((i) => (i <= 0 ? suggestions.length - 1 : i - 1));
+        return;
+      }
+      if (e.key === "Escape") { setShowSuggestions(false); return; }
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (activeIndex >= 0) handleSelectSuggestion(suggestions[activeIndex]);
+        else fetchWeather();
+        return;
+      }
+    } else if (e.key === "Enter") {
+      fetchWeather();
+    }
+  };
+
   const scene = getScene(weather);
   const uv = weather ? uvFromWeatherId(weather.weather[0].id) : 0;
+  const cityTime = weather ? fmtCityClock(clock.getTime(), weather.timezone) : "";
 
   return (
     <div className="app">
@@ -648,16 +762,44 @@ export default function App() {
           <div className="topbar-time">{fmtClock(clock)}</div>
         </div>
 
-        <div className="search-block">
+        <div className="search-block" ref={searchBlockRef}>
           <div className="search-row">
             <input ref={inputRef} className="search-input" type="text" placeholder="Search city…"
-              value={city} onChange={(e) => setCity(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && fetchWeather()}
-              autoComplete="off" spellCheck={false} />
+              value={city}
+              onChange={(e) => { setCity(e.target.value); setShowSuggestions(true); }}
+              onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+              onKeyDown={handleInputKeyDown}
+              autoComplete="off" spellCheck={false}
+              role="combobox" aria-expanded={showSuggestions} aria-autocomplete="list" />
             <button className="search-btn" onClick={fetchWeather} disabled={loading} aria-label="Search">
               {loading ? <SpinIcon /> : <SearchIcon />}
             </button>
           </div>
+
+          {showSuggestions && (suggLoading || suggestions.length > 0) && (
+            <ul className="suggestions-list" role="listbox">
+              {suggLoading && suggestions.length === 0 && (
+                <li className="suggestion-item suggestion-loading">
+                  <SpinIcon />
+                  <span className="suggestion-name">Searching cities…</span>
+                </li>
+              )}
+              {suggestions.map((s, i) => (
+                <li key={`${s.lat}-${s.lon}-${i}`}
+                  role="option" aria-selected={i === activeIndex}
+                  className={`suggestion-item ${i === activeIndex ? "active" : ""}`}
+                  onMouseDown={(e) => { e.preventDefault(); handleSelectSuggestion(s); }}
+                  onMouseEnter={() => setActiveIndex(i)}>
+                  <SearchIcon />
+                  <span className="suggestion-name">
+                    {s.name}{s.state ? `, ${s.state}` : ""}
+                  </span>
+                  <span className="suggestion-country">{s.country}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
           {error && <div className="error-msg">{error}</div>}
         </div>
 
@@ -673,6 +815,10 @@ export default function App() {
               <div className="hero-location">
                 <span className="hero-city">{weather.name}</span>
                 <span className="hero-country">{weather.sys.country}</span>
+              </div>
+              <div className="hero-localtime">
+                <ClockIcon />
+                <span>{cityTime} local time</span>
               </div>
               <div className="hero-main">
                 <img className="hero-icon"
