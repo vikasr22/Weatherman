@@ -20,13 +20,13 @@
   --sans:         'DM Sans', system-ui, sans-serif;
   --mono:         'DM Mono', 'SF Mono', monospace;
 
-  /* Glassmorphism tokens */
-  --glass-bg:        rgba(255,255,255,0.06);
-  --glass-bg-hover:  rgba(255,255,255,0.09);
-  --glass-border:    rgba(255,255,255,0.16);
-  --glass-border-hi: rgba(255,255,255,0.28);
-  --glass-shadow:    0 8px 32px rgba(0,0,0,0.28);
-  --glass-blur:      blur(20px) saturate(170%);
+  /* Glassmorphism tokens — updated to match vibrant image style */
+  --glass-bg:        rgba(255,255,255,0.10);
+  --glass-bg-hover:  rgba(255,255,255,0.15);
+  --glass-border:    rgba(255,255,255,0.22);
+  --glass-border-hi: rgba(255,255,255,0.40);
+  --glass-shadow:    0 8px 32px rgba(0,0,0,0.18);
+  --glass-blur:      blur(24px) saturate(180%);
 }
 
 /* ── Base ── */
@@ -63,6 +63,11 @@ body {
   max-width: 860px;
   margin: 0 auto;
   padding: 28px 24px 60px;
+
+  /* Dynamic text colors injected via inline style; defaults below */
+  --text-1: #f0f2f7;
+  --text-2: #abb2c4;
+  --text-3: #9ca5c1;
 }
 
 /* ── Topbar ── */
@@ -113,8 +118,8 @@ body {
   outline: none;
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.06);
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  box-shadow: var(--glass-shadow);
+  transition: border-color 0.2s, background 0.2s;
   caret-color: var(--accent);
 }
 
@@ -122,8 +127,8 @@ body {
 
 .search-input:focus {
   background: var(--glass-bg-hover);
-  border-color: rgba(79,142,247,0.5);
-  box-shadow: 0 0 0 3px var(--accent-lo), var(--glass-shadow);
+  border-color: rgba(255,255,255,0.50);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.08), var(--glass-shadow);
 }
 
 .search-btn {
@@ -132,21 +137,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(79,142,247,0.55);
-  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.18);
+  border: 1px solid var(--glass-border-hi);
   border-radius: 12px;
   cursor: pointer;
   color: #fff;
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   box-shadow: var(--glass-shadow);
-  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  transition: background 0.2s, transform 0.15s;
   flex-shrink: 0;
 }
 
 .search-btn:hover {
-  background: rgba(106,160,255,0.7);
-  box-shadow: 0 4px 16px var(--accent-glow);
+  background: rgba(255,255,255,0.26);
   transform: translateY(-1px);
 }
 
@@ -166,12 +170,12 @@ body {
   list-style: none;
   max-height: 260px;
   overflow-y: auto;
-  background: rgba(20, 23, 31, 0.65);
-  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.12);
+  border: 1px solid var(--glass-border-hi);
   border-radius: 14px;
-  backdrop-filter: blur(24px) saturate(170%);
-  -webkit-backdrop-filter: blur(24px) saturate(170%);
-  box-shadow: 0 12px 36px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
 }
 
 .suggestion-item {
@@ -189,7 +193,7 @@ body {
 
 .suggestion-item:hover,
 .suggestion-item.active {
-  background: rgba(79,142,247,0.18);
+  background: rgba(255,255,255,0.14);
 }
 
 .suggestion-item.suggestion-loading {
@@ -213,9 +217,10 @@ body {
   font-size: 13px;
   color: #e06060;
   padding: 10px 14px;
-  background: rgba(224,96,96,0.08);
-  border: 1px solid rgba(224,96,96,0.18);
+  background: rgba(224,96,96,0.12);
+  border: 1px solid rgba(224,96,96,0.28);
   border-radius: 10px;
+  backdrop-filter: blur(12px);
 }
 
 /* ── Empty state ── */
@@ -249,38 +254,42 @@ body {
   gap: 12px;
 }
 
-/* ── Card base (glassmorphism) ── */
+/* ── Card base — vibrant glassmorphism matching the image ── */
 .card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.26);
   border-radius: 18px;
   padding: 22px 22px 20px;
   position: relative;
   overflow: hidden;
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.06);
-  transition: border-color 0.2s, transform 0.2s, background 0.2s;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow:
+    0 4px 24px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.30);
+  transition: border-color 0.2s, transform 0.2s, background 0.2s, box-shadow 0.2s;
 }
 
-.card:hover {
-  background: var(--glass-bg-hover);
-  border-color: var(--glass-border-hi);
-  transform: translateY(-1px);
-}
-
+/* Subtle top-edge highlight (matches the frosted glass lip in the image) */
 .card::before {
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0; left: 10%; right: 10%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-hi) 40%, var(--border-hi) 60%, transparent);
-  opacity: 0;
-  transition: opacity 0.2s;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55) 40%, rgba(255,255,255,0.55) 60%, transparent);
+  pointer-events: none;
 }
 
-.card:hover::before { opacity: 1; }
+.card:hover {
+  background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.40);
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.38);
+}
 
+/* Card label uses scene-driven text color */
 .card-label {
   font-size: 11px;
   font-weight: 500;
@@ -301,17 +310,23 @@ body {
 .hero-card {
   grid-column: 1 / 3;
   grid-row: 1;
-  background: linear-gradient(135deg, rgba(79,142,247,0.20) 0%, rgba(255,255,255,0.05) 55%, var(--glass-bg) 100%);
-  border-color: rgba(79,142,247,0.28);
+  background: rgba(255,255,255,0.13);
+  border-color: rgba(255,255,255,0.32);
   padding: 28px 28px 24px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.20),
+    inset 0 1px 0 rgba(255,255,255,0.35);
 }
 
+/* Colorful ambient glow inside the hero card */
 .hero-card::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 80% 20%, rgba(79,142,247,0.08), transparent);
+  background: radial-gradient(ellipse 70% 50% at 80% 20%, rgba(100,160,255,0.12), transparent 70%),
+              radial-gradient(ellipse 50% 60% at 10% 80%, rgba(180,100,255,0.08), transparent 60%);
   pointer-events: none;
+  border-radius: inherit;
 }
 
 .hero-location {
@@ -336,6 +351,7 @@ body {
   font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.5px;
+  color: var(--text-1);
 }
 
 .hero-country {
@@ -355,7 +371,7 @@ body {
 .hero-icon {
   width: 80px;
   height: 80px;
-  filter: drop-shadow(0 0 16px rgba(79,142,247,0.35));
+  filter: drop-shadow(0 0 16px rgba(255,255,255,0.25));
   margin-left: -8px;
 }
 
@@ -420,13 +436,13 @@ body {
 
 .dial-svg { width: 120px; height: 120px; }
 
-.dial-ring       { fill: none; stroke: var(--border-hi); stroke-width: 0.8; }
-.dial-inner      { fill: rgba(255,255,255,0.015); }
+.dial-ring       { fill: none; stroke: rgba(255,255,255,0.22); stroke-width: 0.8; }
+.dial-inner      { fill: rgba(255,255,255,0.04); }
 .tick-major      { stroke: var(--text-3); stroke-width: 1.2; }
-.tick-minor      { stroke: var(--border-hi); stroke-width: 0.7; }
+.tick-minor      { stroke: rgba(255,255,255,0.14); stroke-width: 0.7; }
 .dial-label      { font-family: var(--mono); font-size: 7px; fill: var(--text-3); }
-.needle          { stroke: var(--accent); stroke-width: 2; filter: drop-shadow(0 0 4px var(--accent-glow)); }
-.needle-hub      { fill: var(--accent); }
+.needle          { stroke: #fff; stroke-width: 2; filter: drop-shadow(0 0 4px rgba(255,255,255,0.6)); }
+.needle-hub      { fill: #fff; }
 .dial-value      { font-size: 22px; font-weight: 500; font-family: var(--mono); color: var(--text-1); letter-spacing: -0.5px; }
 .dial-unit       { font-size: 12px; color: var(--text-3); }
 
@@ -454,7 +470,7 @@ body {
 
 .hbar-track {
   height: 4px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.10);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -462,7 +478,7 @@ body {
 .hbar-fill {
   height: 100%;
   border-radius: 99px;
-  background: linear-gradient(90deg, #4f8ef7, #60c0f0);
+  background: linear-gradient(90deg, rgba(255,255,255,0.5), rgba(255,255,255,0.85));
   transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -490,7 +506,7 @@ body {
   gap: 6px;
 }
 
-.sun-item svg { color: var(--warm); }
+.sun-item svg { color: var(--text-2); opacity: 0.8; }
 
 .sun-label {
   font-size: 11px;
@@ -509,7 +525,7 @@ body {
 
 .sun-divider {
   width: 1px;
-  background: var(--border);
+  background: rgba(255,255,255,0.14);
   margin: 0 18px;
   align-self: stretch;
 }
@@ -522,7 +538,7 @@ body {
   font-weight: 300;
   letter-spacing: -1.5px;
   font-family: var(--mono);
-  color: var(--warm);
+  color: var(--text-1);
   line-height: 1;
   margin-bottom: 10px;
 }
@@ -530,6 +546,100 @@ body {
 /* ── Row 3 cards ── */
 .pressure-card { grid-column: 1 / 2; grid-row: 3; }
 .vis-card      { grid-column: 2 / 4; grid-row: 3; }
+
+/* ─────────────────────────────────────────────────────────────
+   LIGHT SCENE OVERRIDES
+   When the background is light (fog, sunrise, sunset, day-hot, snow),
+   cards flip to stronger frosted-white glass and text goes dark.
+───────────────────────────────────────────────────────────── */
+.shell[data-light-scene="true"] {
+  /* Scene-adaptive palette — dark text on light backgrounds */
+  --glass-bg:        rgba(255,255,255,0.38);
+  --glass-bg-hover:  rgba(255,255,255,0.52);
+  --glass-border:    rgba(180,200,220,0.55);
+  --glass-border-hi: rgba(180,200,220,0.80);
+}
+
+.shell[data-light-scene="true"] .card {
+  background: rgba(255,255,255,0.42);
+  border-color: rgba(180,200,225,0.60);
+  box-shadow:
+    0 4px 24px rgba(60,80,120,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.85);
+}
+
+.shell[data-light-scene="true"] .card::before {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.90) 40%, rgba(255,255,255,0.90) 60%, transparent);
+}
+
+.shell[data-light-scene="true"] .card:hover {
+  background: rgba(255,255,255,0.58);
+  border-color: rgba(160,185,215,0.80);
+  box-shadow:
+    0 8px 32px rgba(60,80,120,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+}
+
+.shell[data-light-scene="true"] .hero-card {
+  background: rgba(255,255,255,0.48);
+  border-color: rgba(160,190,220,0.65);
+}
+
+.shell[data-light-scene="true"] .hbar-track {
+  background: rgba(0,30,60,0.10);
+}
+
+.shell[data-light-scene="true"] .hbar-fill {
+  background: linear-gradient(90deg, rgba(30,80,160,0.55), rgba(30,80,160,0.80));
+}
+
+.shell[data-light-scene="true"] .sun-divider {
+  background: rgba(0,30,80,0.14);
+}
+
+.shell[data-light-scene="true"] .dial-ring  { stroke: rgba(0,30,80,0.20); }
+.shell[data-light-scene="true"] .dial-inner { fill: rgba(0,30,80,0.04); }
+.shell[data-light-scene="true"] .tick-major { stroke: rgba(0,30,80,0.45); }
+.shell[data-light-scene="true"] .tick-minor { stroke: rgba(0,30,80,0.16); }
+.shell[data-light-scene="true"] .dial-label { fill: rgba(0,30,80,0.55); }
+.shell[data-light-scene="true"] .needle     { stroke: #0d1a2a; filter: drop-shadow(0 0 3px rgba(0,30,80,0.4)); }
+.shell[data-light-scene="true"] .needle-hub { fill: #0d1a2a; }
+
+.shell[data-light-scene="true"] .search-input {
+  color: var(--text-1);
+  background: rgba(255,255,255,0.48);
+  border-color: rgba(160,190,220,0.60);
+}
+
+.shell[data-light-scene="true"] .search-input:focus {
+  background: rgba(255,255,255,0.65);
+  border-color: rgba(30,80,160,0.40);
+  box-shadow: 0 0 0 3px rgba(30,80,160,0.08);
+}
+
+.shell[data-light-scene="true"] .search-btn {
+  background: rgba(20,50,100,0.22);
+  border-color: rgba(20,50,100,0.22);
+  color: #fff;
+}
+
+.shell[data-light-scene="true"] .search-btn:hover {
+  background: rgba(20,50,100,0.34);
+}
+
+.shell[data-light-scene="true"] .suggestions-list {
+  background: rgba(240,247,255,0.82);
+  border-color: rgba(160,190,220,0.65);
+}
+
+.shell[data-light-scene="true"] .suggestion-item {
+  color: #0d1a2a;
+}
+
+.shell[data-light-scene="true"] .suggestion-item:hover,
+.shell[data-light-scene="true"] .suggestion-item.active {
+  background: rgba(30,80,160,0.10);
+}
 
 /* ── Responsive ── */
 @media (max-width: 640px) {
