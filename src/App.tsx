@@ -566,7 +566,7 @@ export default function App() {
   const inputRef       = useRef<HTMLInputElement>(null);
   const searchBlockRef = useRef<HTMLDivElement>(null);
   const skipNextLookupRef = useRef(false);
-  const API_KEY = "e707cf0cf6c6b09c949bb02e32bf1c42";
+  const e707cf0cf6c6b09c949bb02e32bf1c42 = "e707cf0cf6c6b09c949bb02e32bf1c42";
 
   useEffect(() => {
     const id = setInterval(() => setClock(new Date()), 1000);
@@ -592,7 +592,7 @@ export default function App() {
       try {
         setSuggLoading(true);
         const res = await axios.get<CitySuggestion[]>(
-          `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
+          `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${e707cf0cf6c6b09c949bb02e32bf1c42}`
         );
         setSuggestions(res.data);
         setShowSuggestions(res.data.length > 0);
@@ -613,7 +613,7 @@ export default function App() {
     try {
       setLoading(true); setError("");
       const res = await axios.get<WeatherData>(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city.trim()}&appid=${API_KEY}&units=metric`
+        `https://api.openweathermap.org/data/2.5/weather?q=${city.trim()}&appid=${e707cf0cf6c6b09c949bb02e32bf1c42}&units=metric`
       );
       setWeather(res.data);
     } catch {
@@ -626,7 +626,7 @@ export default function App() {
     try {
       setLoading(true); setError("");
       const res = await axios.get<WeatherData>(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${e707cf0cf6c6b09c949bb02e32bf1c42}&units=metric`
       );
       setWeather(res.data);
     } catch {
