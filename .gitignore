@@ -1,3 +1,6 @@
 node_modules
 build
+<<<<<<< HEAD
 .env
+=======
+>>>>>>> 3883e699a45cda98d16fe5dc9fbf799529f4e799
